@@ -1,0 +1,71 @@
+proxy_cache_path /mnt/var/lib/nginx/proxy_cache levels=1:2 keys_zone=tilemillui:500m inactive=1200m max_size=500m;
+proxy_temp_path /mnt/var/lib/nginx/proxy_temp;
+proxy_connect_timeout 30;
+proxy_read_timeout 120;
+proxy_send_timeout 120;
+
+proxy_cache_key "$scheme$host$request_uri";
+
+upstream tilemill-ui {
+    server 127.0.0.1:20008;
+}
+
+server {
+    listen 80;
+    server_name <%= tilemill_core_hostname %>;
+
+    access_log  /var/log/nginx/tilemill-ui.access.log;
+
+    # Compress result sent back to browser. Useful for UI.
+    gzip on;
+    gzip_buffers 16 8k;
+    gzip_comp_level 6;
+    gzip_http_version 1.0;
+    gzip_min_length 0;
+    gzip_types text/plain text/css text/javascript application/x-javascript application/javascript application/json image/x-icon
+    gzip_vary on;
+
+    if ($host ~* "^([a-zA-Z\-]+)\..*$") {
+        set $prefix $1;
+    }
+
+    location ^~ /assets/ {
+        # Overrides expires header to 1hr *as seen by the client.*
+        expires 1h;
+        proxy_ignore_headers Cache-Control Expires;
+
+        proxy_cache tilemillui;
+        proxy_cache_use_stale updating;
+        proxy_cache_valid 200 1d;
+        proxy_cache_valid 404 1m;
+        proxy_redirect off;
+
+        proxy_set_header Host $http_host;
+        proxy_pass http://tilemill-ui;
+
+    }
+
+    location / {
+        auth_basic "Restricted";
+        auth_basic_user_file  /etc/mapbox/htpasswd;
+
+        proxy_set_header Host $http_host;
+        proxy_pass tilemill-ui;
+    }
+}
+
+upstream tilemill-tiles {
+    server 127.0.0.1:20009;
+}
+
+server {
+    listen 8080;
+    server_name <%= tilemill_core_hostname %>;
+
+    access_log  /var/log/nginx/tilemill-tiles.access.log;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_pass tilemill-tiles;
+    }
+}

@@ -1,0 +1,156 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "MapBox TileMill",
+    "Parameters": {
+        "InstanceType": {
+            "Description": "Type of EC2 instance to use.",
+            "Type": "String",
+            "Default": "m1.large"
+        },
+        "Keyname": {
+            "Description": "SSH key to install.",
+            "Type": "String",
+            "Default": ""
+        },
+        "WebPassword": {
+            "Description": "Basic auth password.",
+            "Type": "String",
+            "Default": ""
+        }
+    },
+    "Resources":{
+        "TileMillSecurityGroup": {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+              "GroupDescription" : "Allow SSH and HTTP access",
+              "SecurityGroupIngress" : [
+                {
+                    "IpProtocol" : "tcp",
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": 22,
+                    "ToPort": 22
+                },
+                {
+                    "IpProtocol" : "tcp",
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": 80,
+                    "ToPort": 80 
+                }
+                {
+                    "IpProtocol" : "tcp",
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": 8080,
+                    "ToPort": 8080 
+                }
+              ]
+            }
+        },
+        "TileMillRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": { "Service": [ "ec2.amazonaws.com" ] },
+                            "Action": [ "sts:AssumeRole" ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                ]
+            }
+        },
+        "TileMillInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [ { "Ref": "TileMillRole" } ]
+            }
+        },
+        "TileMillLaunchConfig" : {
+            "Type" : "AWS::AutoScaling::LaunchConfiguration",
+            "Properties" : {
+                "IamInstanceProfile": { "Ref": "TileMillInstanceProfile" },
+                "KeyName": { "Ref": "Keyname"},
+                "ImageId": { "Fn::FindInMap": [ "AMIs", { "Ref": "AWS::Region" }, "id" ] },
+                "SecurityGroups": [ { "Ref": "TileMillSecurityGroup"} ],
+                "InstanceType": { "Ref": "InstanceType" },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash -e",
+                                "# Apt / NPM installs",
+                                "add-apt-repository -y ppa:developmentseed/mapbox",
+                                "#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0FB81AF3",
+                                "apt-get update && apt-get -y upgrade",
+                                "apt-get -y install libmapnik nodejs tilemill",
+                                "apt-get -y --force-yes install ruby rubygems",
+                                "apt-get -y --force-yes install git",
+                                "#echo -e '|1|4o6WY2MmG00uZBzAlVgNjhG7yow=|5FSbTiQSMPuBKVujohclTRdOUEs= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n|1|qIRk+jqHDzACEtOCX8CPZhIZcKg=|OXPpDEZUMASa2JlsMLq8+VeyFFw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' > /root/.ssh/known_hosts",
+                                "# Manual installs",
+                                "cd /usr/local/src",
+                                "wget http://puppetlabs.com/downloads/facter/facter-1.6.14.tar.gz",
+                                "tar xvzf facter-1.6.14.tar.gz",
+                                "cd facter-1.6.14",
+                                "ruby install.rb",
+                                "cd /usr/local/src",
+                                "wget http://puppetlabs.com/downloads/puppet/puppet-3.0.1.tar.gz",
+                                "tar xvzf /usr/local/src/puppet-3.0.1.tar.gz",
+                                "cd puppet-3.0.1",
+                                "ruby install.rb",
+                                "cd /root",
+                                "groupadd puppet",
+                                "useradd -M -g puppet puppet",
+                                "gem install hiera hiera-puppet",
+                                "# Setup local configuration",
+                                "mkdir /etc/mapbox",
+                                { "Fn::Join": [ "", [
+                                    "echo '", { "Ref" : "WebPassword" }, "' > /etc/mapbox/webpassword"
+                                ]]},
+                                "# Let puppet take the rest",
+                                "cd /usr/local/src",
+                                "git clone git@github.com:miccolis/aws-tilemill.git",
+                                "rm -rf /etc/puppet",
+                                "ln -s /usr/local/src/aws-tm/puppet /etc/puppet",
+                                "#puppet apply --modulepath=/etc/puppet/modules --logdest=/var/log/puppet.log /etc/puppet/manifests/site.pp"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "TileMillGroup" : {
+            "Type" : "AWS::AutoScaling::AutoScalingGroup",
+            "Properties" : {
+                "AvailabilityZones": { "Fn::GetAZs" : "" },
+                "LaunchConfigurationName" : { "Ref" : "TileMillLaunchConfig" },
+                "MinSize" : "1",
+                "MaxSize" : "1",
+                "DesiredCapacity" : "1",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": { "Fn::Join": [ " ", [ { "Ref": "AWS::StackName" }, "- TileMill" ] ] },
+                        "PropagateAtLaunch" : "true"
+                    }
+                ]
+            }
+        }
+    },
+    "Mappings": {
+        "AMIs": {
+            "us-east-1": { "id": "ami-9a873ff3" },
+            "us-west-1": { "id": "ami-a34f69e6" },
+            "us-west-2": { "id": "ami-1aab222a" },
+            "eu-west-1": { "id": "ami-a16665d5" },
+            "ap-northeast-1": { "id": "ami-eca719ed" },
+            "ap-southeast-1": { "id": "ami-fefcbcac" },
+            "ap-southeast-1": { "id": "ami-fb8611c1" },
+            "sa-east-1": { "id": "ami-b45b82a9" }
+        }
+    }
+}
