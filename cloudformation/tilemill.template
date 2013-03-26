@@ -89,8 +89,7 @@
                                 "#apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0FB81AF3",
                                 "apt-get update && apt-get -y upgrade",
                                 "apt-get -y install libmapnik nodejs tilemill",
-                                "apt-get -y --force-yes install ruby rubygems",
-                                "apt-get -y --force-yes install git",
+                                "apt-get -y --force-yes install ruby rubygems git libssl-dev",
                                 "echo -e '|1|4o6WY2MmG00uZBzAlVgNjhG7yow=|5FSbTiQSMPuBKVujohclTRdOUEs= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n|1|qIRk+jqHDzACEtOCX8CPZhIZcKg=|OXPpDEZUMASa2JlsMLq8+VeyFFw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' > /root/.ssh/known_hosts",
                                 "# Manual installs",
                                 "cd /usr/local/src",
@@ -110,7 +109,9 @@
                                 "# Setup local configuration",
                                 "mkdir /etc/mapbox",
                                 { "Fn::Join": [ "", [
-                                    "echo '", { "Ref" : "WebPassword" }, "' > /etc/mapbox/webpassword"
+                                    "echo \"tilemill:$(openssl passwd -crypt '",
+                                    { "Ref" : "WebPassword" },
+                                    "')\" > /etc/mapbox/webpassword"
                                 ]]},
                                 "# Let puppet take the rest",
                                 "cd /usr/local/src",

@@ -1,6 +1,5 @@
 # Base packages
 package { ntp: ensure => installed }
-package { libssl-dev: ensure => installed }
 package { nginx: ensure => installed }
 
 # Next two configs increase ulimit nofile
