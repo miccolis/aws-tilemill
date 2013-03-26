@@ -35,7 +35,7 @@
                     "CidrIp": "0.0.0.0/0",
                     "FromPort": 80,
                     "ToPort": 80 
-                }
+                },
                 {
                     "IpProtocol" : "tcp",
                     "CidrIp": "0.0.0.0/0",
@@ -77,6 +77,7 @@
                 "ImageId": { "Fn::FindInMap": [ "AMIs", { "Ref": "AWS::Region" }, "id" ] },
                 "SecurityGroups": [ { "Ref": "TileMillSecurityGroup"} ],
                 "InstanceType": { "Ref": "InstanceType" },
+                "SpotPrice": "0.12",
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -90,7 +91,7 @@
                                 "apt-get -y install libmapnik nodejs tilemill",
                                 "apt-get -y --force-yes install ruby rubygems",
                                 "apt-get -y --force-yes install git",
-                                "#echo -e '|1|4o6WY2MmG00uZBzAlVgNjhG7yow=|5FSbTiQSMPuBKVujohclTRdOUEs= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n|1|qIRk+jqHDzACEtOCX8CPZhIZcKg=|OXPpDEZUMASa2JlsMLq8+VeyFFw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' > /root/.ssh/known_hosts",
+                                "echo -e '|1|4o6WY2MmG00uZBzAlVgNjhG7yow=|5FSbTiQSMPuBKVujohclTRdOUEs= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n|1|qIRk+jqHDzACEtOCX8CPZhIZcKg=|OXPpDEZUMASa2JlsMLq8+VeyFFw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' > /root/.ssh/known_hosts",
                                 "# Manual installs",
                                 "cd /usr/local/src",
                                 "wget http://puppetlabs.com/downloads/facter/facter-1.6.14.tar.gz",
@@ -113,9 +114,9 @@
                                 ]]},
                                 "# Let puppet take the rest",
                                 "cd /usr/local/src",
-                                "git clone git@github.com:miccolis/aws-tilemill.git",
+                                "git clone git://github.com:miccolis/aws-tilemill.git",
                                 "rm -rf /etc/puppet",
-                                "ln -s /usr/local/src/aws-tm/puppet /etc/puppet",
+                                "ln -s /usr/local/src/aws-tilemill/puppet /etc/puppet",
                                 "#puppet apply --modulepath=/etc/puppet/modules --logdest=/var/log/puppet.log /etc/puppet/manifests/site.pp"
                             ]
                         ]

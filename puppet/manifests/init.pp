@@ -2,20 +2,8 @@ node default {
 
     # Base packages
     package { ntp: ensure => installed }
-    package { htop: ensure => installed }
-    package { sysstat: ensure => installed }
-    package { tmux: ensure => installed }
-    #package { sqlite3: ensure => installed }
-    #package { git-core: ensure => installed }
-    #package { build-essential:  ensure => installed }
-    #package { curl: ensure => installed }
-    #package { libsqlite3-0: ensure => installed }
-    #package { libsqlite3-dev: ensure => installed }
-    #package { libzip-dev: ensure => installed }
-    #package { libzip1: ensure => installed }
-    #package { "libgtk2.0-dev": ensure => installed }
-    #package { libwebkitgtk-dev: ensure => installed }
-    #package { libssl-dev: ensure => installed }
+    package { libssl-dev: ensure => installed }
+    package { nginx: ensure => installed }
 
     # Next two configs increase ulimit nofile
     file { "/etc/security/limits.conf":
@@ -41,7 +29,7 @@ node default {
         group => "tilemill",
     }
     file { "/home/tilemill/.tilemill/config.json":
-	replace => false
+	replace => false,
         content => "puppet:///modules/tilemill/config.json"
     }
 
