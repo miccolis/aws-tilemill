@@ -114,10 +114,10 @@
                                 ]]},
                                 "# Let puppet take the rest",
                                 "cd /usr/local/src",
-                                "git clone git://github.com:miccolis/aws-tilemill.git",
+                                "git clone git://github.com/miccolis/aws-tilemill.git",
                                 "rm -rf /etc/puppet",
                                 "ln -s /usr/local/src/aws-tilemill/puppet /etc/puppet",
-                                "#puppet apply --modulepath=/etc/puppet/modules --logdest=/var/log/puppet.log /etc/puppet/manifests/site.pp"
+                                "puppet apply --modulepath=/etc/puppet/modules --logdest=/var/log/puppet.log /etc/puppet/manifests/init.pp"
                             ]
                         ]
                     }
