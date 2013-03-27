@@ -33,16 +33,30 @@ file { "/home/tilemill/.tilemill/config.json":
 # Nginx config
 file { "/etc/nginx/sites-available/tilemill":
     content => template("tilemill/tilemill-nginx.conf.erb"),
+    require => Package["nginx"],
+    refresh => Package["nginx"]
 }
 file { "/etc/nginx/sites-enabled/tilemill":
     ensure => "/etc/nginx/sites-available/tilemill",
     require => File["/etc/nginx/sites-available/tilemill"],
+    refresh => Service["nginx"],
 }
 file { "/etc/nginx/sites-enabled/default":
     ensure => absent,
 }
+service { "nginx":
+    type => "init",
+    hasrestart => true,
+}
 
-# Upstart config
+# TileMill config
 file { "/etc/init/tilemill.conf":
     content => template("tilemill/tilemill-upstart.conf.erb")
+}
+
+service { "tile":
+    type => "upstart",
+    ensure => "running",
+    enabled => true,
+    require => File["/home/tilemill/.tilemill/config.json"],
 }

@@ -109,9 +109,9 @@
                                 "# Setup local configuration",
                                 "mkdir /etc/mapbox",
                                 { "Fn::Join": [ "", [
-                                    "echo \"tilemill:$(openssl passwd -crypt '",
+                                    "echo \"tilemill:$(openssl passwd -apr1 ",
                                     { "Ref" : "WebPassword" },
-                                    "')\" > /etc/mapbox/webpassword"
+                                    ')\" > /etc/mapbox/htpasswd"
                                 ]]},
                                 "# Let puppet take the rest",
                                 "cd /usr/local/src",
