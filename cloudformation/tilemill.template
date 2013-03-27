@@ -111,7 +111,7 @@
                                 { "Fn::Join": [ "", [
                                     "echo \"tilemill:$(openssl passwd -apr1 ",
                                     { "Ref" : "WebPassword" },
-                                    ')\" > /etc/mapbox/htpasswd"
+                                    ")\" > /etc/mapbox/htpasswd"
                                 ]]},
                                 "# Let puppet take the rest",
                                 "cd /usr/local/src",
