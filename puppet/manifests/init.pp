@@ -33,7 +33,7 @@ file { "/home/tilemill/.tilemill/config.json":
 # Nginx config
 file { "/etc/nginx/sites-available/tilemill":
     content => template("tilemill/tilemill-nginx.conf.erb"),
-    require => Package["nginx"],
+    require => [ Package["nginx"], Service["tilemill"] ],
 }
 file { "/etc/nginx/sites-enabled/tilemill":
     ensure => "/etc/nginx/sites-available/tilemill",
