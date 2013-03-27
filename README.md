@@ -71,7 +71,7 @@ Using `git` may be easier to transfer files and keep them versioned. Say you wan
 
 Choose an instance type with at least >= 2GB ram and multiple cores. Go as big as you like, just make sure you don't let the machine run for more than a few days or forget to shut it down otherwise you'll be surprised by the bill at the end of the month. See [this page](http://aws.amazon.com/ec2/pricing/#on-demand) for pricing details per instance type.
 
-If you just need TileMill running for a relatively short period of time consider using Spot pricing.
+If you just need TileMill running for a relatively short period of time consider using spot pricing. To use spot pricing simply add a line like `"SpotPrice": "0.10",` in the `TileMillLaunchConfig` section of the cloudformation template. For example just above the `UserData` script.
 
 ### Note about "shutdown behavior".
 
