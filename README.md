@@ -21,7 +21,9 @@ If you need to create a kep pair, in the left sidebar of the EC2 console click o
 
 ## Launch TileMill
 
-Navigate to CloudFormation (https://console.aws.amazon.com/cloudformation/home), enter a name for your "Stack" and select "Provide a template URL", and enter the url `[S3-URI]`.
+Download [the cloudformation template](https://raw.github.com/miccolis/aws-tilemill/master/cloudformation/tilemill.template) to your computer.
+
+Navigate to CloudFormation (https://console.aws.amazon.com/cloudformation/home), enter a name for your "Stack" and select "Upload a template file" and upload the file.
 
 On the next screen you'll need to provide the name of the key pair you created, a password for accessing TileMill and select an instance size. If you're not sure about the instance size, just start with `m1.large`, the default.
 
@@ -29,9 +31,9 @@ On the next screen you'll need to provide the name of the key pair you created, 
 
 It takes a few minutes for AWS to provision your server, and then for TileMill to be installed. So grab a fresh cup of coffee and in 10-15 minutes everything should be running.
 
-Hi again! Head back to the EC2 console. The instances page should show a big green ball indicating the instance is running, click on it to display its metadata. Scroll down through the description details to find the "Public DNS" url and copy it, and paste it into a web browser. You'll be prompted to enter a username and password. The username is `tilemill` and the password is whatever you set while launching the instance.
+Hi again! Head back to the EC2 console. The instances page should show a big green ball indicating the instance is running, click on it to display its metadata. Scroll down through the description details to find the "Public DNS" url, copy and paste it into a web browser. You'll be prompted to enter a username and password. The username is `tilemill` and the password is whatever you set while launching the instance.
 
-If the instance is running, but you can't get to tilemill give a it a couple more minute. After that log into the box via ssh (see below) and see if there are errors in `/var/log/syslog`, `/var/log/puppet.log` or `/var/log/upstart/tilemill.log`.
+If the instance is running, but you can't get to tilemill give it a couple more minutes to finish. After that log into the box via ssh (see below) and see if there are errors in `/var/log/syslog`, `/var/log/puppet.log` or `/var/log/upstart/tilemill.log`.
 
 ### Connecting to the instance via ssh
 
