@@ -34,18 +34,17 @@ file { "/home/tilemill/.tilemill/config.json":
 file { "/etc/nginx/sites-available/tilemill":
     content => template("tilemill/tilemill-nginx.conf.erb"),
     require => Package["nginx"],
-    refresh => Package["nginx"]
 }
 file { "/etc/nginx/sites-enabled/tilemill":
     ensure => "/etc/nginx/sites-available/tilemill",
     require => File["/etc/nginx/sites-available/tilemill"],
-    refresh => Service["nginx"],
+    notify => Service["nginx"],
 }
 file { "/etc/nginx/sites-enabled/default":
     ensure => absent,
 }
 service { "nginx":
-    type => "init",
+    provider => "init",
     hasrestart => true,
 }
 
@@ -54,9 +53,9 @@ file { "/etc/init/tilemill.conf":
     content => template("tilemill/tilemill-upstart.conf.erb")
 }
 
-service { "tile":
-    type => "upstart",
+service { "tilemill":
+    provider => "upstart",
     ensure => "running",
-    enabled => true,
+    enable => true,
     require => File["/home/tilemill/.tilemill/config.json"],
 }
