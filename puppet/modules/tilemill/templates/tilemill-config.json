@@ -1,0 +1,6 @@
+{
+    "server": "true",
+    "listenHost": "0.0.0.0",
+    "coreUrl": "<%= ec2_public_hostname %>",
+    "tileUrl": "<%= ec2_public_hostname %>:8080",
+}

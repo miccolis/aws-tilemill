@@ -26,8 +26,10 @@ file { "/home/tilemill/.tilemill":
     group => "tilemill",
 }
 file { "/home/tilemill/.tilemill/config.json":
+    content => template("tilemill/tilemill-config.json")
+    owner => "tilemill",
+    group => "tilemill",
     replace => false,
-    content => "puppet:///modules/tilemill/config.json"
 }
 
 # Nginx config
@@ -45,6 +47,7 @@ file { "/etc/nginx/sites-enabled/default":
 }
 service { "nginx":
     provider => "init",
+    ensure => "running",
     hasrestart => true,
 }
 
